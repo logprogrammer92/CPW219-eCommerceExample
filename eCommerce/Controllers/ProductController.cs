@@ -40,6 +40,5 @@ public class ProductController : Controller
             return RedirectToAction(nameof(Index));
         }
         return View(p); // If model state is invalid, return the view with the product data and validation errors
-
     }
 }

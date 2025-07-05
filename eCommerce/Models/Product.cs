@@ -6,7 +6,9 @@ namespace eCommerce.Models;
 /// Represents an individual product for sale
 /// </summary>
 public class Product
-{   
+{
+    internal readonly int ProductId;
+
     /// <summary>
     /// The unique identifier for the product
     /// </summary>

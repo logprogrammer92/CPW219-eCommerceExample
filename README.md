@@ -10,8 +10,9 @@ of ASP.NET Core MVC (Model View Controller).
 
 ## How to get started
 - Clone or download the repository
-- Download .NET 9 SDK
-- Recommended to use Visual Studio 2022
+	- `git clone https://github.com/logprogrammer92/CPW219-eCommerceExample.git`
+- [Download .NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- [Recommended to use Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
 - Open in VS 2022 and hit run
 
 ## Technologies/Frameworks used

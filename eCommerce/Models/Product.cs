@@ -6,12 +6,13 @@ namespace eCommerce.Models;
 /// Represents an individual product for sale
 /// </summary>
 public class Product
-{   
+{
+
     /// <summary>
     /// The unique identifier for the product
     /// </summary>
     [Key]
-    public int ProductID { get; set; }
+    public int ProductId { get; set; }
 
     /// <summary>
     /// The user facing title of the product

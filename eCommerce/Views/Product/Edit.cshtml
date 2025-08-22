@@ -1,7 +1,7 @@
 ﻿@model eCommerce.Models.Product
 
 @{
-    ViewData["Title"] = $"Edit{Model.Title}";
+    ViewData["Title"] = $"Edit {Model.Title}";
 }
 
 <h1>Edit @Model.Title</h1>
@@ -29,7 +29,7 @@
 </div>
 
 <div>
-    <a asp-action="Index" asp-asp-controller="Product">Back to Product listings</a>
+    <a asp-action="Index" asp-controller="Product">Back to Product listings</a>
 </div>
 
 @section Scripts {

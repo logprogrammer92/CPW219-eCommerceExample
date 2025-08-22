@@ -7,13 +7,12 @@ namespace eCommerce.Models;
 /// </summary>
 public class Product
 {
-    internal readonly int ProductId;
 
     /// <summary>
     /// The unique identifier for the product
     /// </summary>
     [Key]
-    public int ProductID { get; set; }
+    public int ProductId { get; set; }
 
     /// <summary>
     /// The user facing title of the product

@@ -54,6 +54,6 @@ public class ProductController : Controller
                 return NotFound();
             }
 
-        return View(product);
+            return View(product);
         }
     }

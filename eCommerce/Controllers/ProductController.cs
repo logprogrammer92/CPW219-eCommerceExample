@@ -82,4 +82,22 @@ public class ProductController : Controller
         }
         return View(product);
     }
+
+    [ActionName(nameof(Delete))]
+    [HttpPost]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        Product? product = _context.Products.Find(id);
+
+        if (product == null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        _context.Remove(product);
+        await _context.SaveChangesAsync();
+
+        TempData["Message"] = $"{product.Title} has been deleted successfully!";
+        return RedirectToAction(nameof(Index));
+    }
 }

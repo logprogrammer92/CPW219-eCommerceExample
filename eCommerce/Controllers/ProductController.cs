@@ -43,31 +43,60 @@ public class ProductController : Controller
 
     }
         [HttpGet]
-        public IActionResult Edit(int id) 
+        public async Task<IActionResult> Edit(int id) 
         {
-            Product? product = _context.Products
-                .Where(p => p.ProductId == id)
-                .FirstOrDefault();
+            Product? product = await _context.Products.FindAsync(id);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+                if (product == null)
+                {
+                   return NotFound();
+                }
 
-            return View(product);
+                return View(product);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(Product product)
-    {
-        if (ModelState.IsValid)
         {
-            _context.Update(product); // Update the product in the context
-            await _context.SaveChangesAsync(); // Save changes to the database
+            if (ModelState.IsValid)
+            {
+                _context.Update(product); // Update the product in the context
+             await _context.SaveChangesAsync(); // Save changes to the database
             
-            TempData["Message"] = $"{product.Title} has been updated successfully!"; // Set a success message in TempData
+                TempData["Message"] = $"{product.Title} has been updated successfully!"; // Set a success message in TempData
+                return RedirectToAction(nameof(Index));
+            }
+            return View(product); // If model state is invalid, return the view with the product data and validation errors
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
+    {
+        Product? product = await _context.Products
+            .Where(p => p.ProductId == id).FirstOrDefaultAsync();
+        
+        if (product == null)
+        {
+            return NotFound();
+        }
+        return View(product);
+    }
+
+    [ActionName(nameof(Delete))]
+    [HttpPost]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        Product? product = _context.Products.Find(id);
+
+        if (product == null)
+        {
             return RedirectToAction(nameof(Index));
         }
-        return View(product); // If model state is invalid, return the view with the product data and validation errors
+
+        _context.Remove(product);
+        await _context.SaveChangesAsync();
+
+        TempData["Message"] = $"{product.Title} has been deleted successfully!";
+        return RedirectToAction(nameof(Index));
     }
 }

@@ -59,15 +59,27 @@ public class ProductController : Controller
 
         [HttpPost]
         public async Task<IActionResult> Edit(Product product)
-    {
-        if (ModelState.IsValid)
         {
-            _context.Update(product); // Update the product in the context
-            await _context.SaveChangesAsync(); // Save changes to the database
+            if (ModelState.IsValid)
+            {
+                _context.Update(product); // Update the product in the context
+             await _context.SaveChangesAsync(); // Save changes to the database
             
-            TempData["Message"] = $"{product.Title} has been updated successfully!"; // Set a success message in TempData
-            return RedirectToAction(nameof(Index));
+                TempData["Message"] = $"{product.Title} has been updated successfully!"; // Set a success message in TempData
+                return RedirectToAction(nameof(Index));
+            }
+            return View(product); // If model state is invalid, return the view with the product data and validation errors
+    }
+
+    public IActionResult Delete(int id)
+    {
+        Product? product = _context.Products
+            .Where(p => p.ProductId == id).FirstOrDefault();
+        
+        if (product == null)
+        {
+            return NotFound();
         }
-        return View(product); // If model state is invalid, return the view with the product data and validation errors
+        return View(product);
     }
 }

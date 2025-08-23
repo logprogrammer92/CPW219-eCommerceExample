@@ -71,10 +71,11 @@ public class ProductController : Controller
             return View(product); // If model state is invalid, return the view with the product data and validation errors
     }
 
-    public IActionResult Delete(int id)
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
     {
-        Product? product = _context.Products
-            .Where(p => p.ProductId == id).FirstOrDefault();
+        Product? product = await _context.Products
+            .Where(p => p.ProductId == id).FirstOrDefaultAsync();
         
         if (product == null)
         {

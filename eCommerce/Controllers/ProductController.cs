@@ -43,18 +43,16 @@ public class ProductController : Controller
 
     }
         [HttpGet]
-        public IActionResult Edit(int id) 
+        public async Task<IActionResult> Edit(int id) 
         {
-            Product? product = _context.Products
-                .Where(p => p.ProductId == id)
-                .FirstOrDefault();
+            Product? product = await _context.Products.FindAsync(id);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+                if (product == null)
+                {
+                   return NotFound();
+                }
 
-            return View(product);
+                return View(product);
         }
 
         [HttpPost]

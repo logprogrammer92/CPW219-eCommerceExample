@@ -5,27 +5,48 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Controllers;
 
+/// <summary>
+/// Controller for managing products in the eCommerce application.
+/// </summary>
 public class ProductController : Controller
 {
     private readonly ProductDbContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the ProductController class with the specified database context.
+    /// </summary>
+    /// <param name="context">The product controller object</param>
     public ProductController(ProductDbContext context)
     {
-        _context = context;
+        _context = context; // Assign the provided context to the private field
     }
 
+    /// <summary>
+    /// Displays a list of all products in the database.
+    /// </summary>
+    /// <returns>Redirects the user to the products index page with
+    ///  all products populated from the database.</returns>
     public async Task<IActionResult> Index()
     {
-        List<Product> allProducts = await _context.Products.ToListAsync();
-        return View(allProducts);
+        List<Product> allProducts = await _context.Products.ToListAsync(); // Retrieve all products from the database asynchronously
+        return View(allProducts); // Return the index view with the list of products
     }
 
+    /// <summary>
+    /// Displays the create view for a new product.
+    /// </summary>
+    /// <returns>returns the create view</returns>
     [HttpGet]
     public IActionResult Create()
     {
-        return View();
+        return View(); // Return the create view for a new product
     }
 
+    /// <summary>
+    /// Creates a new product and saves it to the database.
+    /// </summary>
+    /// <param name="p">The product in the database</param>
+    /// <returns>User directed to the index page</returns>
     [HttpPost]
     public async Task<IActionResult> Create(Product p)
     {
@@ -42,61 +63,82 @@ public class ProductController : Controller
         return View(p); // If model state is invalid, return the view with the product data and validation errors
 
     }
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id) 
+
+    /// <summary>
+    /// Displays the edit view for a product with the specified ID.
+    /// </summary>
+    /// <param name="id">The ID of the product to edit</param>
+    /// <returns>returns the edit view</returns>
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id) 
+    {
+        Product? product = await _context.Products.FindAsync(id); // Find the product by ID
+
+        if (product == null) // Check if the product exists
         {
-            Product? product = await _context.Products.FindAsync(id);
-
-                if (product == null)
-                {
-                   return NotFound();
-                }
-
-                return View(product);
+                return NotFound(); // If not found, return a 404 Not Found response
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Update(product); // Update the product in the context
-             await _context.SaveChangesAsync(); // Save changes to the database
-            
-                TempData["Message"] = $"{product.Title} has been updated successfully!"; // Set a success message in TempData
-                return RedirectToAction(nameof(Index));
-            }
-            return View(product); // If model state is invalid, return the view with the product data and validation errors
+            return View(product); // Return the edit view with the product data
     }
 
+    /// <summary>
+    /// Updates an existing product in the database.
+    /// </summary>
+    /// <param name="product">The product in the database</param>
+    /// <returns>User directed to the product index page</returns>
+    [HttpPost]
+    public async Task<IActionResult> Edit(Product product)
+    {
+        if (ModelState.IsValid)
+        {
+            _context.Update(product); // Update the product in the context
+            await _context.SaveChangesAsync(); // Save changes to the database
+            
+            TempData["Message"] = $"{product.Title} has been updated successfully!"; // Set a success message in TempData
+            return RedirectToAction(nameof(Index));
+        }
+        return View(product); // If model state is invalid, return the view with the product data and validation errors
+    }
+
+    /// <summary>
+    /// Displays the confirmation page for deleting a product.
+    /// </summary>
+    /// <param name="id">The ID of the product to delete</param>
+    /// <returns>returns the delete view</returns>
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
         Product? product = await _context.Products
-            .Where(p => p.ProductId == id).FirstOrDefaultAsync();
-        
-        if (product == null)
+            .Where(p => p.ProductId == id).FirstOrDefaultAsync(); // Find the product by ID
+
+        if (product == null) // Check if the product exists
         {
-            return NotFound();
+            return NotFound(); // If not found, return a 404 Not Found response
         }
-        return View(product);
+        return View(product); // Return the delete view with the product data
     }
 
+    /// <summary>
+    /// Deletes a product from the database.
+    /// </summary>
+    /// <param name="id">The ID of the product to delete</param>
+    /// <returns>User directed to products index page</returns>
     [ActionName(nameof(Delete))]
     [HttpPost]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        Product? product = _context.Products.Find(id);
+        Product? product = _context.Products.Find(id); // Find the product by ID
 
-        if (product == null)
+        if (product == null) // Check if the product exists
         {
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index)); // If not found, redirect to the index page
         }
 
-        _context.Remove(product);
-        await _context.SaveChangesAsync();
+        _context.Remove(product); // Remove the product from the context
+        await _context.SaveChangesAsync(); // Save changes to the database
 
-        TempData["Message"] = $"{product.Title} has been deleted successfully!";
-        return RedirectToAction(nameof(Index));
+        TempData["Message"] = $"{product.Title} has been deleted successfully!"; // Set a success message in TempData
+        return RedirectToAction(nameof(Index)); // Redirect to the index page after deletion
     }
 }

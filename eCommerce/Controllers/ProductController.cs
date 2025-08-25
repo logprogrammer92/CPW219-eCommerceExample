@@ -26,10 +26,34 @@ public class ProductController : Controller
     /// </summary>
     /// <returns>Redirects the user to the products index page with
     ///  all products populated from the database.</returns>
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        List<Product> allProducts = await _context.Products.ToListAsync(); // Retrieve all products from the database asynchronously
-        return View(allProducts); // Return the index view with the list of products
+        const int ProductsPerPage = 3; // Products per page
+
+        int totalProducts = await _context.Products.CountAsync(); // Total number of products in the database
+        int totalPagesNeeded = (int)Math.Ceiling(totalProducts / (double)ProductsPerPage); // Calculate total number of pages
+
+        if (page < 1) // Ensure the page number is at least 1
+            page = 1; 
+
+        // If the user tries to navigate beyond the last page, set page to the last page
+        if (totalPagesNeeded > 0 && page > totalPagesNeeded) page = totalPagesNeeded; 
+
+        List<Product> allProducts = await _context.Products
+            .OrderBy(p => p.Title) // Order products by ProductId
+            .Skip((page - 1) * ProductsPerPage) // Skip products for previous pages
+            .Take(ProductsPerPage) // Take only the products for the current page
+            .ToListAsync(); // Retrieve all products from the database asynchronously
+
+        ProductListViewModel productListViewModel = new()
+        {
+            Products = allProducts,
+            CurrentPage = page,
+            TotalPages = totalPagesNeeded,
+            PageSize = ProductsPerPage,
+            TotalItems = totalProducts
+        };
+        return View(productListViewModel); // Return the index view with the list of products
     }
 
     /// <summary>
@@ -141,4 +165,5 @@ public class ProductController : Controller
         TempData["Message"] = $"{product.Title} has been deleted successfully!"; // Set a success message in TempData
         return RedirectToAction(nameof(Index)); // Redirect to the index page after deletion
     }
+
 }

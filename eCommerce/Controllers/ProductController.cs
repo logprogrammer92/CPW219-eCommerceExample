@@ -26,11 +26,28 @@ public class ProductController : Controller
     /// </summary>
     /// <returns>Redirects the user to the products index page with
     ///  all products populated from the database.</returns>
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index( string? searchTerm, decimal? minPrice, decimal? maxPrice, int page = 1)
     {
         const int ProductsPerPage = 3; // Products per page
 
-        int totalProducts = await _context.Products.CountAsync(); // Total number of products in the database
+        IQueryable<Product> query = _context.Products; // Start creating query, doesn't run yet
+
+        // Apply filters
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            string lowered = searchTerm.Trim().ToLower();
+            query = query.Where(p => p.Title.Contains(searchTerm)); // Filter by search term
+        }
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value); // Filter by minimum price
+        }
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value); // Filter by maximum price
+        }
+
+        int totalProducts = await query.CountAsync(); // Get the total count of products after filtering
         int totalPagesNeeded = (int)Math.Ceiling(totalProducts / (double)ProductsPerPage); // Calculate total number of pages
 
         if (page < 1) // Ensure the page number is at least 1
@@ -39,7 +56,7 @@ public class ProductController : Controller
         // If the user tries to navigate beyond the last page, set page to the last page
         if (totalPagesNeeded > 0 && page > totalPagesNeeded) page = totalPagesNeeded; 
 
-        List<Product> allProducts = await _context.Products
+        List<Product> allProducts = await query
             .OrderBy(p => p.Title) // Order products by ProductId
             .Skip((page - 1) * ProductsPerPage) // Skip products for previous pages
             .Take(ProductsPerPage) // Take only the products for the current page
@@ -51,7 +68,10 @@ public class ProductController : Controller
             CurrentPage = page,
             TotalPages = totalPagesNeeded,
             PageSize = ProductsPerPage,
-            TotalItems = totalProducts
+            TotalItems = totalProducts,
+            SearchTerm = searchTerm,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice
         };
         return View(productListViewModel); // Return the index view with the list of products
     }

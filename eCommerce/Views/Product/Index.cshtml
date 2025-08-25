@@ -10,6 +10,25 @@
 	Create Product
 </a>
 
+<form method="get" asp-action="Index" class="row g-3 mb-4">
+	<div class="col-md-4">
+		<label for="searchTerm" class="form-label">Title Contains</label>
+		<input type="text" class="form-control" id="searchTerm" name="searchTerm" value="@Model.SearchTerm" />
+	</div>
+	<div class="col-md-2">
+		<label for="minPrice" class="form-label">Min Price</label>
+		<input type="number" step="0.01" class="form-control" id="minPrice" name="minPrice" value="@(Model.MinPrice?.ToString("F2") ?? "")" />
+	</div>
+	<div class="col-md-2">
+		<label for="maxPrice" class="form-label">Max Price</label>
+		<input type="number" step="0.01" class="form-control" id="maxPrice" name="maxPrice" value="@(Model.MaxPrice?.ToString("F2") ?? "")" />
+	</div>
+	<div class="col-md-4 d-flex align-items-end gap-2">
+		<button type="submit" class="btn btn-primary">Filter</button>
+		<a asp-action="Index" class="btn btn-secondary">Clear</a>
+	</div>
+</form>
+
 @if (TempData["Message"] != null)
 {
 	<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -55,24 +74,22 @@ else
 <nav aria-label="Product pages">
 		<ul class="pagination">
 			<li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-				<a class="page-link" asp-action="Index" asp-route-page="1">First</a>
+				<a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchTerm="@Model.SearchTerm" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice">First</a>
 			</li>
 			<li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-				<a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
-
-
+				<a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-searchTern="@Model.SearchTerm" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice">Previous</a>
 			</li>
 			@for (int i = 1; i <= Model.TotalPages; i++)
 			{
 				<li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-					<a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+					<a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchTerm="@Model.SearchTerm" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice">@i</a>
 				</li>
 			}
 			<li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-				<a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+				<a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-searchTerm="@Model.SearchTerm" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice">Next</a>
 			</li>
 			<li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-				<a class="page-link" asp-action="Index" asp-route-page="@(Model.TotalPages)">Last</a>
+				<a class="page-link" asp-action="Index" asp-route-page="@(Model.TotalPages)" asp-route-searchTerm="@Model.SearchTerm" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice">Last</a>
 			</li>
 		</ul>
 </nav>

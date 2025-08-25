@@ -100,11 +100,11 @@ namespace eCommerce.Controllers
             if (ModelState.IsValid)
             {
                 // Check if UsernameOrEmail and Password match a record in the database
-                Member? loggedInMember = await _context.Members
-                                     .Where(m => (m.Username == login.UsernameOrEmail 
-                                     || m.Email == login.UsernameOrEmail) // Check if UsernameOrEmail matches either Username or Email
-                                         && m.Password == login.Password) 
-                                         .SingleOrDefaultAsync(); // SingleOrDefaultAsync() returns a single record or null if no match is found
+                var loggedInMember = await _context.Members
+                                     .Where(m => (m.Username == login.UsernameOrEmail || m.Email == login.UsernameOrEmail) // Check if UsernameOrEmail matches either Username or Email
+                                         && m.Password == login.Password)
+                                     .Select(m => new { m.Username, m.MemberId})
+                                     .SingleOrDefaultAsync(); // SingleOrDefaultAsync() returns a single record or null if no match is found
 
                 if (loggedInMember == null) 
                 {

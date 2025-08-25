@@ -1,6 +1,7 @@
 ﻿using eCommerce.Data;
 using eCommerce.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Controllers
@@ -42,6 +43,27 @@ namespace eCommerce.Controllers
 
             if (ModelState.IsValid)
             {
+                // Check if the username or email already exists in the database
+                bool usernameTaken = await _context.Members
+                    .AnyAsync(m => m.Username == reg.Username); // Check if the username already exists
+                if (usernameTaken)
+                {
+                    ModelState.AddModelError(nameof(Member.Username), "Username already taken");
+                }
+
+                bool emailTaken = await _context.Members
+                    .AnyAsync(m => m.Email == reg.Email); // Check if the email already exists
+                
+                if (emailTaken)
+                {
+                    ModelState.AddModelError(nameof(Member.Email), "Email already taken");
+                }
+
+                if (usernameTaken || emailTaken)
+                {
+                    return View(reg); // Return the registration view with an error message if username or email is taken
+                }
+
                 // Map ViewModel to Member model tracked by DB
                 Member newMember = new()
                 {
@@ -50,22 +72,7 @@ namespace eCommerce.Controllers
                     Password = reg.Password,
                     DateOfBirth = reg.DateOfBirth
                 };
-                // Check if the username or email already exists in the database
-                bool usernameExists = await _context.Members
-                    .AnyAsync(m => m.Username == newMember.Username); // Check if the username already exists
-                bool emailExists = await _context.Members
-                    .AnyAsync(m => m.Email == newMember.Email); // Check if the email already exists
-                if (usernameExists || emailExists) // If either username or email already exists
-                {
-                    ModelState.AddModelError(string.Empty, "Username or Email already exists. Please choose a different one."); // Add an error to the model state
-                    return View(reg); // Return the registration view with an error message
-                }
-                else
-                {
-                    _context.Members.Add(newMember); // Add the new member to the context
-                    await _context.SaveChangesAsync(); // Save changes to the database
-                    return RedirectToAction("Index", "Home"); // Redirect to the home page after successful registration
-                }
+                
 
             }
 
